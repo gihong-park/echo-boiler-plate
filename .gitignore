@@ -12,6 +12,9 @@
 *.so
 *.dylib
 
+# test db
+*.db
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -27,5 +30,6 @@ go.work
 ### Go Patch ###
 /vendor/
 /Godeps/
+
 
 # End of https://www.toptal.com/developers/gitignore/api/go
