@@ -1,0 +1,19 @@
+version: '3'
+services:
+  test-server:
+    build:
+      dockerfile: dockerfile.dev
+      context: .
+      args:
+       port: $PORT
+
+    volumes:
+      - .:/app/
+    ports:
+      - "$PORT:$PORT"
+    command:
+      - goconvey
+      - -host=0.0.0.0
+      - -port=$PORT
+      - -workDir=/app
+      - -launchBrowser=false

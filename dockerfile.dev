@@ -1,0 +1,23 @@
+FROM golang:1.18
+
+ARG port
+ARG app_path
+
+ENV PORT=$port
+ENV APP_NAME=github.com/smartystreets/goconvey
+
+EXPOSE ${PORT}
+
+RUN apt update -y \
+  && apt upgrade -y \
+  && apt install -y git \
+  && go install ${APP_NAME}@latest
+
+WORKDIR /app
+
+COPY go.mod go.sum /app/
+
+RUN go mod download
+
+
+COPY . .
