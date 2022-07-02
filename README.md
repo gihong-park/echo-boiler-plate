@@ -9,6 +9,7 @@
 - 이후에는 `$ docker-compose up`을 통해서 실행합니다.
 
 ### without docker
+- `go mod download`를 통해서 패키지 설치를 합니다.
 - `go install https://github.com/smartystreets/goconvey@latest` 명령어를 통해서 goconvey를 설치
 - echo 'export PATH="$PATH:$GOPATH/bin"' >> ~/.zshrc `$GOPATH`는 `$ go env` 를 통해 나온 `path`를 적습니다.
 
