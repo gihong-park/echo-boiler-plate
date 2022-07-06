@@ -2,16 +2,17 @@ package todoService
 
 import (
 	"blog_api/app/controller/dto"
-	"blog_api/app/db"
 	"blog_api/app/model"
-	"blog_api/app/repository/todoRepository"
+	tr "blog_api/app/repository/todoRepository"
 )
 
 type TodoService interface {
+	Init() TodoService
 	Save(todoDTO *dto.TodoDTO) model.Todo
+	SetRepo(todoRepo tr.TodoRepository) tr.TodoRepository
 }
 
-func NewTodoService(todoRepo todoRepository.TodoRepository) TodoService {
-	database := db.GetDB("sqlite")
-	return &TodoServiceImpl{todoRepo: todoRepository.NewTodoRepository(database)}
+func NewTodoService[T TodoService]() TodoService {
+	var todoServ T
+	return todoServ.Init()
 }

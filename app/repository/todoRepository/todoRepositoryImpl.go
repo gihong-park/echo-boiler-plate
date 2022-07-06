@@ -18,3 +18,11 @@ func (repo *TodoRepositoryImpl) Save(todoDTO *dto.TodoDTO) model.Todo {
 	log.Default().Printf("affected rows are %v", result.RowsAffected)
 	return *todo
 }
+
+func (repo *TodoRepositoryImpl) SetDB(DB *gorm.DB) {
+	repo.DB = DB
+}
+
+func (repo *TodoRepositoryImpl) Init() TodoRepository {
+	return &TodoRepositoryImpl{}
+}

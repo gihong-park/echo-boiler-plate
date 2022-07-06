@@ -11,12 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var errList = make(map[string]string)
-
-func init() {
-	errList = make(map[string]string)
-}
-
 func GetDB(DBDriver string) *gorm.DB {
 	var err error
 	var db *gorm.DB

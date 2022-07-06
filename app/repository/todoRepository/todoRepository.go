@@ -8,9 +8,12 @@ import (
 )
 
 type TodoRepository interface {
+	Init() TodoRepository
 	Save(todo *dto.TodoDTO) model.Todo
+	SetDB(DB *gorm.DB)
 }
 
-func NewTodoRepository(DB *gorm.DB) TodoRepository {
-	return &TodoRepositoryImpl{DB}
+func NewTodoRepository[T TodoRepository]() TodoRepository {
+	var todoRepo T
+	return todoRepo.Init()
 }

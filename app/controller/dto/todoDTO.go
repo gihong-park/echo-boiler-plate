@@ -7,7 +7,7 @@ import (
 )
 
 type TodoDTO struct {
-	Body string
+	Body string `json:"body"`
 }
 
 func (todoDTO *TodoDTO) ToModel() *model.Todo {

@@ -24,3 +24,14 @@ func TestIndexHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Equal(t, "Hello, World!", rec.Body.String())
 }
+
+func TestIndexRoutes(t *testing.T) {
+	e := echo.New()
+
+	g := e.Group("/api/v1")
+
+	indexCont := IndexController{}
+
+	routes := indexCont.Routes(g)
+	assert.Equal(t, e.Routes(), routes)
+}

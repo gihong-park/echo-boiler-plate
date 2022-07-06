@@ -3,6 +3,8 @@ module blog_api
 go 1.18
 
 require (
+	github.com/google/wire v0.5.0
+	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/stretchr/testify v1.7.2

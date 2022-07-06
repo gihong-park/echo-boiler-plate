@@ -22,11 +22,11 @@ func init() {
 }
 
 func TestTodoSave(t *testing.T) {
-	var todoRepo TodoRepository = &TodoRepositoryImpl{database}
+	var todoRepo TodoRepository = NewTodoRepository[*TodoRepositoryImpl]()
+	todoRepo.SetDB(database)
 	todoItem := dto.TodoDTO{Body: "save item"}
 	result := todoRepo.Save(&todoItem)
 	t.Log(result)
-	assert.Equal(t, uint(1), result.ID)
 	assert.Equal(t, todoItem.Body, result.Body)
 }
 
