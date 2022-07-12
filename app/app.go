@@ -32,6 +32,9 @@ func Init() {
 
 	app.db.Debug().AutoMigrate(&model.Todo{})
 	app.server.Use(middleware.CORS())
+	app.server.Use(middleware.Logger())
+	app.server.Use(middleware.Recover())
+	app.server.Use(middleware.CSRF())
 
 	app.server.Logger.Fatal(app.server.Start(":8000"))
 }
