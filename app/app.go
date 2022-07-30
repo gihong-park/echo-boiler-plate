@@ -4,9 +4,12 @@ import (
 	"blog_api/app/controller"
 	"blog_api/app/db"
 	"blog_api/app/model"
+	"blog_api/app/util"
 	"fmt"
+	"os"
+	"path/filepath"
 
-	"github.com/joho/godotenv"
+	promMW "github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
@@ -17,24 +20,42 @@ type App struct {
 	server *echo.Echo
 }
 
-func init() {
-	err := godotenv.Load(".env")
-	fmt.Println(err)
-}
-
 func Init() {
-	echoServer := echo.New()
+	echoServer := util.NewServer()
 	app := App{db: db.GetDB("sqlite"), server: echoServer}
+	DefaultRoutes(app)
 
-	cont := controller.InitController(app.db)
-
-	cont.Routes(app.server)
+	RegistMiddlewares(app.server)
 
 	app.db.Debug().AutoMigrate(&model.Todo{})
-	app.server.Use(middleware.CORS())
-	app.server.Use(middleware.Logger())
-	app.server.Use(middleware.Recover())
-	app.server.Use(middleware.CSRF())
+
+	p := promMW.NewPrometheus("blog_api", nil)
+	p.Use(app.server)
 
 	app.server.Logger.Fatal(app.server.Start(":8000"))
+}
+
+func LoggerConfigure(config middleware.LoggerConfig) (middleware.LoggerConfig, *os.File) {
+	absPath, _ := filepath.Abs(".")
+	fmt.Println("root folder:", absPath)
+	f, _ := os.Create(absPath + "/blog_api.log")
+
+	config.Output = f
+	return config, f
+}
+
+func DefaultRoutes(app App) {
+	cont := controller.InitController(app.db)
+	cont.Routes(app.server)
+}
+
+func RegistMiddlewares(e *echo.Echo) {
+	config, f := LoggerConfigure(middleware.DefaultLoggerConfig)
+	defer f.Close()
+
+	e.Use(middleware.CORS())
+	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(config))
+	e.Use(middleware.Recover())
+	e.Use(middleware.CSRF())
 }

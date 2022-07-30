@@ -8,7 +8,7 @@ import (
 
 type TodoService interface {
 	Init() TodoService
-	Save(todoDTO *dto.TodoDTO) model.Todo
+	Save(todoDTO *dto.TodoDTO) (*model.Todo, error)
 	SetRepo(todoRepo tr.TodoRepository) tr.TodoRepository
 }
 

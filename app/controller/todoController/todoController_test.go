@@ -4,6 +4,7 @@ import (
 	"blog_api/app/controller/dto"
 	"blog_api/app/db"
 	"blog_api/app/model"
+	"blog_api/app/util"
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -14,11 +15,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func init() {
+	database := db.GetDB("sqlite")
+	database.Migrator().DropTable(&model.Todo{})
+	database.AutoMigrate(&model.Todo{})
+}
+
 func TestTodoController(t *testing.T) {
-	e := echo.New()
+	e := util.NewServer()
 	todoCont := InitTodoController(db.GetDB("sqlite"))
 
-	bodyContent := "save test1"
+	bodyContent := "save item"
 	todoDTO := dto.TodoDTO{Body: bodyContent}
 	todoJson, _ := json.Marshal(todoDTO)
 

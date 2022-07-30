@@ -1,0 +1,8 @@
+filebeat.inputs:
+  - type: log
+    paths:
+      - /var/log/*.log
+setup.kibana.host: "http://kibana:5601"
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]

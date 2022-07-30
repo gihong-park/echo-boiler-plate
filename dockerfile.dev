@@ -1,22 +1,24 @@
 FROM golang:1.18
 
 ARG port
-ARG app_path
 
 ENV PORT=$port
-ENV APP_NAME=github.com/smartystreets/goconvey
+ENV GOCONVEY=github.com/smartystreets/goconvey
+ENV AIR=github.com/cosmtrek/air
 
 EXPOSE ${PORT}
 
 RUN apt update -y \
   && apt upgrade -y \
   && apt install -y git \
-  && go install ${APP_NAME}@latest
+  && go install ${GOCONVEY}@latest \
+  && go install ${AIR}@latest
 
 WORKDIR /app
 
 COPY go.mod go.sum /app/
 
+RUN go mod vendor
 RUN go mod download
 
 

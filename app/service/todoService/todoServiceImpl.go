@@ -20,6 +20,6 @@ func (todoServ *TodoServiceImpl) SetRepo(todoRepo tr.TodoRepository) todoReposit
 	return todoServ.todoRepo
 }
 
-func (todoServ *TodoServiceImpl) Save(todoDTO *dto.TodoDTO) model.Todo {
+func (todoServ *TodoServiceImpl) Save(todoDTO *dto.TodoDTO) (*model.Todo, error) {
 	return todoServ.todoRepo.Save(todoDTO)
 }

@@ -18,7 +18,7 @@ func TestIndexHandler(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetPath("/api/v1")
 
-	controller.indexHandler(c)
+	controller.IndexHandler(c)
 	t.Log(c.Path())
 
 	assert.Equal(t, http.StatusOK, rec.Code)

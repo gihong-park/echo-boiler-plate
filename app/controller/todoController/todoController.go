@@ -15,5 +15,9 @@ type TodoController struct {
 func (todoController *TodoController) SaveHandler(c echo.Context) error {
 	t := new(dto.TodoDTO)
 	c.Bind(t)
-	return c.JSON(http.StatusCreated, todoController.todoServ.Save(t))
+	todo, err := todoController.todoServ.Save(t)
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusCreated, todo)
 }

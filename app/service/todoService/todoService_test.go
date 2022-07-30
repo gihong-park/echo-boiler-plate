@@ -24,16 +24,15 @@ func init() {
 
 func TestTodoService(t *testing.T) {
 	todoServ = NewTodoService[*TodoServiceImpl]()
-	todoRepo := todoRepository.NewTodoRepository[*todoRepository.TodoRepositoryImpl]()
-	todoServ.SetRepo(todoRepo).SetDB(database)
-	todoDTO := dto.TodoDTO{Body: "save todo service"}
-	todoModel := todoServ.Save(&todoDTO)
+	var todoRepo todoRepository.TodoRepository = &todoRepository.TodoRepositoryImpl{DB: database}
+	todoServ.SetRepo(todoRepo)
+	todoDTO := dto.TodoDTO{Body: "save item"}
+	todoModel, err := todoServ.Save(&todoDTO)
+	if err != nil {
+		t.Fatalf("TodoService has failed: %v", err)
+	}
 
 	assert.Equal(t, todoRepo, todoServ.SetRepo(todoRepo))
 	t.Log(todoModel)
 	assert.Equal(t, todoDTO.Body, todoModel.Body)
-}
-
-func TestTest(t *testing.T) {
-	assert.Equal(t, "Hello", "Hello")
 }

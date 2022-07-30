@@ -1,19 +1,86 @@
 version: '3'
 services:
   test-server:
+    profiles: ["test"]
     build:
       dockerfile: dockerfile.dev
       context: .
       args:
-       port: $PORT
+       port: $TEST_PORT
+    env_file:
+      - ./config/env/.env.test
 
     volumes:
       - .:/app/
     ports:
-      - "$PORT:$PORT"
+      - "$TEST_PORT:$TEST_PORT"
     command:
       - goconvey
       - -host=0.0.0.0
-      - -port=$PORT
+      - -port=$TEST_PORT
       - -workDir=/app
       - -launchBrowser=false
+  
+  server:
+    profiles: ["elk", "dev"]
+    env_file:
+      - ./config/env/.env.dev
+    build:
+      dockerfile: dockerfile.dev
+      context: .
+      args:
+        port: $API_PORT
+    volumes:
+      - .:/app/
+    ports:
+      - "$API_PORT:$API_PORT"
+    command: air 
+
+  filebeat:
+    profiles: ["elk" ]
+    image: docker.elastic.co/beats/filebeat:$ELK_VER
+    labels:
+      co.elastic.logs/enabled: false
+    user: root
+    command: filebeat -e -strict.perms=false
+    volumes:
+      - ./config/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml
+      - ./blog_api.log:/var/log/blog_api.log
+
+  elasticsearch:
+    labels:
+      co.elastic.logs/enabled: false
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    profiles: ["elk"]
+    image: docker.elastic.co/elasticsearch/elasticsearch:$ELK_VER
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-X", "GET", "http://localhost:9200/_cat/health?v=true"]
+      interval: 3s
+      timeout: 3s
+      retries: 80
+    ports:
+     - 9200:9200
+     - 9300:9300
+
+  kibana:
+    profiles: ["elk" ]
+    labels:
+      co.elastic.logs/enabled: false
+    image: docker.elastic.co/kibana/kibana:$ELK_VER
+    environment:
+     ELASTICSEARCH_URL: http://elasticsearch:9200
+     ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-f", "http://localhost:5601/api/status"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 80
+    ports:
+      - 5601:5601
+    
+

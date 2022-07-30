@@ -14,22 +14,53 @@ import (
 )
 
 var database *gorm.DB
+var todoItem dto.TodoDTO = dto.TodoDTO{Body: "save item"}
+var todoRepo TodoRepository
 
 func init() {
 	database = db.GetDB("sqlite")
 	database.Migrator().DropTable(&model.Todo{})
 	database.AutoMigrate(&model.Todo{})
+	todoRepo = &TodoRepositoryImpl{database}
+	todoRepo.Save(&todoItem)
 }
 
 func TestTodoSave(t *testing.T) {
-	var todoRepo TodoRepository = NewTodoRepository[*TodoRepositoryImpl]()
-	todoRepo.SetDB(database)
-	todoItem := dto.TodoDTO{Body: "save item"}
-	result := todoRepo.Save(&todoItem)
+	result, err := todoRepo.Save(&todoItem)
+	if err != nil {
+		t.Fatalf("TodoSave has failed: %v", err)
+	}
 	t.Log(result)
 	assert.Equal(t, todoItem.Body, result.Body)
 }
 
-func TestTest(t *testing.T) {
-	assert.Equal(t, "Hello", "Hello")
+func TestTodoGetByID(t *testing.T) {
+	id := uint(1)
+	result, err := todoRepo.GetByID(id)
+	if err != nil {
+		t.Fatalf("TodoGetByID has failed: %v", err)
+	}
+	t.Log(result)
+	assert.Equal(t, todoItem.Body, result.Body)
+	assert.Equal(t, id, result.ID)
+}
+
+func TestTodoGetAll(t *testing.T) {
+	todos, err := todoRepo.GetAll()
+	if err != nil {
+		t.Fatalf("TodoGetAll has failed: %v", err)
+	}
+
+	t.Log(todos)
+	assert.Greater(t, len(*todos), 0)
+}
+
+func TestSetDB(t *testing.T) {
+	todoRepo.SetDB(database)
+
+	assert.Equal(t, database, todoRepo.GetDB())
+}
+
+func TestGetDB(t *testing.T) {
+	assert.Equal(t, database, todoRepo.GetDB())
 }

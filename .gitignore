@@ -31,5 +31,7 @@ go.work
 /vendor/
 /Godeps/
 
+# environment file
+.env*
 
 # End of https://www.toptal.com/developers/gitignore/api/go
