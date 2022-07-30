@@ -15,3 +15,12 @@
 
 ## 테스트 서버 포트 변경
 goconvey 포트를 변경하기 위해서는 `.env` 파일의 `PORT` 값을 변경하면 됩니다.
+
+## wire로 dp injection 생성
+- wire_gen.sh 를 실행하여서 코드 생성
+- 추가적으로 파일 생성시 해당 패키지 명을 뒤에 추가
+
+## code convention
+- 파일, 패키지 이름은 `camel case`를 이용합니다.
+- 함수, 인터페이스, 구조체는 `pascal case`를 이용합니다.
+- 테스트 함수는 `prefix`로 `Test`를 붙입니다.

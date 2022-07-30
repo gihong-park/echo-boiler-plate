@@ -7,12 +7,9 @@ import (
 )
 
 type TodoService interface {
-	Init() TodoService
 	Save(todoDTO *dto.TodoDTO) (*model.Todo, error)
+	GetByID(id uint) (*model.Todo, error)
+	GetAll() (*[]model.Todo, error)
+	UpdateByID(todoDTO *dto.TodoDTO) (*model.Todo, error)
 	SetRepo(todoRepo tr.TodoRepository) tr.TodoRepository
-}
-
-func NewTodoService[T TodoService]() TodoService {
-	var todoServ T
-	return todoServ.Init()
 }

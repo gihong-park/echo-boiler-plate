@@ -42,4 +42,9 @@ func TestTodoController(t *testing.T) {
 	todoModel := new(model.Todo)
 	json.Unmarshal(rec.Body.Bytes(), todoModel)
 	assert.Equal(t, bodyContent, todoModel.Body)
+	// t.Log("asdfasdf")
+}
+
+func TestTest(t *testing.T) {
+	assert.Equal(t, "hello", "hello")
 }

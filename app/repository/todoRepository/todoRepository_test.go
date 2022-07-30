@@ -55,6 +55,21 @@ func TestTodoGetAll(t *testing.T) {
 	assert.Greater(t, len(*todos), 0)
 }
 
+func TestTodoUpdateByID(t *testing.T) {
+	todoItem.Body = "updated Item"
+	todoItem.ID = 1
+	todo, err := todoRepo.UpdateByID(&todoItem)
+	if err != nil {
+		t.Fail()
+		t.Fatalf("TodoUpdateByID: %v", err)
+	}
+	if assert.NotEmpty(t, todo) {
+		t.Log(todo)
+		assert.Equal(t, todoItem.Body, todo.Body)
+		assert.Equal(t, todoItem.ToModel().ID, todo.ID)
+	}
+}
+
 func TestSetDB(t *testing.T) {
 	todoRepo.SetDB(database)
 

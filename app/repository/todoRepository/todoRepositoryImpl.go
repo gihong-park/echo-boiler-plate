@@ -4,6 +4,7 @@ import (
 	"blog_api/app/controller/dto"
 	"blog_api/app/model"
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -31,13 +32,28 @@ func (repo *TodoRepositoryImpl) GetByID(id uint) (todo *model.Todo, err error) {
 	return todo, nil
 }
 
-func (repo *TodoRepositoryImpl) GetAll() (todo *[]model.Todo, err error) {
-	var todos []model.Todo
+func (repo *TodoRepositoryImpl) GetAll() (todos *[]model.Todo, err error) {
 	err = repo.DB.Debug().Model(&model.Todo{}).Find(&todos).Error
 	if err != nil {
-		return &todos, err
+		return todos, err
 	}
-	return &todos, nil
+	return todos, nil
+}
+
+func (repo *TodoRepositoryImpl) UpdateByID(todoDTO *dto.TodoDTO) (todo *model.Todo, err error) {
+	todo, err = repo.GetByID(todoDTO.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	todo.Body = todoDTO.Body
+	todo.UpdatedAt = time.Now().UTC()
+
+	err = repo.DB.Debug().Model(model.Todo{}).Where("id = ?", todoDTO.ID).Updates(&todo).Error
+	if err != nil {
+		return nil, err
+	}
+	return todo, nil
 }
 
 func (repo *TodoRepositoryImpl) SetDB(DB *gorm.DB) {
