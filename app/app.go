@@ -25,14 +25,15 @@ func Init() {
 	app := App{db: db.GetDB("sqlite"), server: echoServer}
 	DefaultRoutes(app)
 
-	RegistMiddlewares(app.server)
+	f := RegistMiddlewares(app.server)
+	defer f.Close()
 
 	app.db.Debug().AutoMigrate(&model.Todo{})
 
 	p := promMW.NewPrometheus("blog_api", nil)
 	p.Use(app.server)
 
-	app.server.Logger.Fatal(app.server.Start(":8000"))
+	app.server.Logger.Fatal(app.server.Start(":" + os.Getenv("API_PORT")))
 }
 
 func LoggerConfigure(config middleware.LoggerConfig) (middleware.LoggerConfig, *os.File) {
@@ -49,13 +50,14 @@ func DefaultRoutes(app App) {
 	cont.Routes(app.server)
 }
 
-func RegistMiddlewares(e *echo.Echo) {
+func RegistMiddlewares(e *echo.Echo) *os.File {
 	config, f := LoggerConfigure(middleware.DefaultLoggerConfig)
-	defer f.Close()
 
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
 	e.Use(middleware.LoggerWithConfig(config))
 	e.Use(middleware.Recover())
 	e.Use(middleware.CSRF())
+
+	return f
 }

@@ -21,26 +21,13 @@ func (todoServ *TodoServiceImpl) Save(todoDTO *dto.TodoDTO) (*model.Todo, error)
 }
 
 func (todoServ *TodoServiceImpl) GetByID(id uint) (*model.Todo, error) {
-	todo, err := todoServ.todoRepo.GetByID(id)
-	if err != nil {
-		return nil, err
-	}
-	return todo, nil
+	return todoServ.todoRepo.GetByID(id)
 }
 
 func (todoServ *TodoServiceImpl) GetAll() (*[]model.Todo, error) {
-	todos, err := todoServ.todoRepo.GetAll()
-	if err != nil {
-		return nil, err
-	}
-	return todos, nil
+	return todoServ.todoRepo.GetAll()
 }
 
 func (todoServ *TodoServiceImpl) UpdateByID(todoDTO *dto.TodoDTO) (*model.Todo, error) {
-	todo, err := todoServ.todoRepo.UpdateByID(todoDTO)
-	if err != nil {
-		return nil, err
-	}
-
-	return todo, nil
+	return todoServ.todoRepo.UpdateByID(todoDTO)
 }

@@ -17,6 +17,7 @@ func (todoController *TodoController) SaveHandler(c echo.Context) error {
 	c.Bind(t)
 	todo, err := todoController.todoServ.Save(t)
 	if err != nil {
+		c.Logger().Errorf("fail to save todo", err)
 		return err
 	}
 	return c.JSON(http.StatusCreated, todo)

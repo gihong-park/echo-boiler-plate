@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 services:
   test-server:
     profiles: ["test"]
@@ -32,12 +32,25 @@ services:
         port: $API_PORT
     volumes:
       - .:/app/
+    environment:
+      - API_PORT=8000
     ports:
       - "$API_PORT:$API_PORT"
     command: air 
+  
+  prod_server:
+    profiles: ["prod"]
+    env_file:
+      - ./config/env/.env.prod
+    build:
+      context: .
+      args:
+        port: $API_PORT
+    ports:
+      - "$API_PORT:$API_PORT"
 
   filebeat:
-    profiles: ["elk" ]
+    profiles: ["elk"]
     image: docker.elastic.co/beats/filebeat:$ELK_VER
     labels:
       co.elastic.logs/enabled: false
@@ -45,7 +58,7 @@ services:
     command: filebeat -e -strict.perms=false
     volumes:
       - ./config/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml
-      - ./blog_api.log:/var/log/blog_api.log
+      - ./portfolio.log:/var/log/portfolio.log
 
   elasticsearch:
     labels:
