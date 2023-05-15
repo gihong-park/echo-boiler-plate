@@ -6,6 +6,7 @@ pipeline {
     CGO_ENABLED = 0 
     REPOSITORY_NAME = ""
     GIT_URL = ""
+    PROJECT_NAME = ""
   }
 
   stages {
@@ -45,9 +46,9 @@ pipeline {
         withCredentials(bindings: [gitUsernamePassword(credentialsId: 'git-credential', gitToolName: 'Default')]) {
           sh 'git config --local user.email dev.gihong2012@gmail.com'
           sh 'git config --local user.name gihong-park'
-          sh "helm template portfolio . --set image.tag=${env.BUILD_NUMBER} > ./kubernetes-manifests/kubernetes-manifests.yaml"
+          sh "helm template ${PROJECT_NAME} . --set image.tag=${env.BUILD_NUMBER} > ./kubernetes-manifests/kubernetes-manifests.yaml"
           sh 'git add kubernetes-manifests/kubernetes-manifests.yaml'
-          sh "git commit -m '[UPDATE] portfolio ${env.BUILD_NUMBER} image versioning'"
+          sh "git commit -m '[UPDATE] ${PROJECT_NAME} ${env.BUILD_NUMBER} image versioning'"
           sh 'git push origin main'
         }
 

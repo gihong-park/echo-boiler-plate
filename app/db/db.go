@@ -59,7 +59,7 @@ func GetDB(DBDriver string) *gorm.DB {
 		}
 		setDBConnectionPool(db, DBDriver)
 	} else if DBDriver == "sqlite" {
-		db, err = gorm.Open(sqlite.Open("../../test.db"))
+		db, err = gorm.Open(sqlite.Open(util.GetRootPath() + "/test.db"))
 		if err != nil {
 			fmt.Printf("Cannot connect to %s database", DBDriver)
 			log.Fatal("This is the error connecting to sqlite")

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -16,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 )
 
 var (
@@ -26,8 +26,7 @@ func init() {
 	if !util.IsTest() {
 
 		if err := godotenv.Load(util.GetRootPath() + "/.env"); err != nil {
-			log.Println("[FATAL] fail to load .env file")
-			log.Fatalln(err)
+			log.Fatalf("[FATAL] fail to load .env file: %w", err)
 		}
 		API_SECRET = os.Getenv("API_SECRET")
 	} else {
@@ -62,7 +61,7 @@ func TokenValidByRole(r role.Role) func(r *http.Request) error {
 			pretty(claims)
 			err = claims.Valid()
 			if err != nil {
-				log.Println("claims is not valid", err)
+				return fmt.Errorf("claims is not valid because: %w", err)
 			}
 		}
 		return nil
@@ -71,7 +70,8 @@ func TokenValidByRole(r role.Role) func(r *http.Request) error {
 
 func keyFunc(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		log.Errorf("unexpected signing method: %w", token.Header["alg"])
+		return nil, fmt.Errorf("unexpected signing method: %w", token.Header["alg"])
 	}
 	return []byte(API_SECRET), nil
 }
@@ -115,13 +115,13 @@ func ExtractClaims(c echo.Context) (jwt.MapClaims, error) {
 	tokenString := ExtractToken(c.Request())
 	token, err := jwt.Parse(tokenString, keyFunc)
 	if err != nil {
-		log.Println("[ERROR] token parse error:", err)
+		log.Errorf("[ERROR] token parse error: %w", err)
 		return nil, err
 	}
 
 	err = token.Claims.Valid()
 	if err != nil {
-		log.Println("[ERROR] token validation error:", err)
+		log.Errorf("[ERROR] token validation error: %w", err)
 		return nil, err
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
@@ -135,8 +135,8 @@ func ExtractClaims(c echo.Context) (jwt.MapClaims, error) {
 func pretty(data interface{}) {
 	b, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
-		log.Println(err)
+		log.Errorf("[ERROR] json marshal failed: %w", err)
 		return
 	}
-	fmt.Println(string(b))
+	log.Infof("[INFO] json marshal as : %s", string(b))
 }

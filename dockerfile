@@ -1,5 +1,6 @@
 FROM golang:1.20 as builder
 RUN apt update && apt install git ca-certificates
+ARG port
 
 WORKDIR /usr/src/app
 COPY . .
