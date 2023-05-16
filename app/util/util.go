@@ -1,18 +1,17 @@
 package util
 
 import (
-	"log"
 	"os"
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 )
 
 func GetRootPath() string {
 	dir, err := os.Getwd()
 	if err != nil {
-		log.Println("[Fatal] fail to get root directory")
-		log.Fatal(err)
+		log.Fatalf("[Fatal] fail to get root directory: %w", err)
 	}
 	return dir
 }

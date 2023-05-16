@@ -43,6 +43,13 @@ func TestTodoSave(t *testing.T) {
 
 }
 
+func TestTodoSaveBadRequest(t *testing.T) {
+	dto := dto.TodoDTO{Body: ""}
+	todoModel, err := todoServ.Save(&dto)
+	assert.IsType(t, &model.Todo{}, todoModel)
+	assert.ErrorContains(t, err, "code=")
+}
+
 func TestTodoGetByID(t *testing.T) {
 	todo, err := todoServ.GetByID(1)
 	if err != nil {

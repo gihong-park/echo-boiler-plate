@@ -44,6 +44,31 @@ func TestTodoController(t *testing.T) {
 	assert.Equal(t, bodyContent, todoModel.Body)
 }
 
+type Map map[string]interface{}
+
+func TestTodoSaveController(t *testing.T) {
+	e := util.NewServer()
+	todoCont := InitTodoController(db.GetDB("sqlite"))
+
+	todoDTO := dto.TodoDTO{Body: ""}
+	todoJson, _ := json.Marshal(todoDTO)
+
+	req := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(todoJson))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/api/v1/todo")
+
+	err := todoCont.SaveHandler(c)
+	if assert.Error(t, err) {
+		if he, ok := err.(*echo.HTTPError); ok {
+			assert.Equal(t, http.StatusBadRequest, he.Code)
+			assert.ErrorContains(t, he, "code=")
+		}
+	}
+}
+
 func TestTest(t *testing.T) {
 	assert.Equal(t, "hello", "hello")
 }

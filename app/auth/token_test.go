@@ -70,6 +70,8 @@ func TestTokenValidByRole(t *testing.T) {
 	t.Log("[INFO] token valid error:", err)
 
 	assert.Nil(t, err)
+	err = TokenValidByRole(role.Admin)(req)
+	assert.NotNil(t, err)
 }
 
 func TestExtractClaim(t *testing.T) {
@@ -115,3 +117,8 @@ func tokenRequest() *http.Request {
 
 	return req
 }
+
+// func TestTokenValidByRole(t *testing.T) {
+// 	assert.Equal(t, true, TokenValidByRole(role.Member)(tokenRequest()))
+// 	assert.Equal(t, false, TokenValidByRole(role.Member)(tokenRequest()))
+// }

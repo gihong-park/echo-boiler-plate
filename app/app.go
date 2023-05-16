@@ -32,6 +32,7 @@ func Init() {
 
 	p := promMW.NewPrometheus("blog_api", nil)
 	p.Use(app.server)
+	app.server.HTTPErrorHandler = echoServer.DefaultHTTPErrorHandler
 
 	app.server.Logger.Fatal(app.server.Start(":" + os.Getenv("API_PORT")))
 }
@@ -57,7 +58,7 @@ func RegistMiddlewares(e *echo.Echo) *os.File {
 	e.Use(middleware.Logger())
 	e.Use(middleware.LoggerWithConfig(config))
 	e.Use(middleware.Recover())
-	e.Use(middleware.CSRF())
+	// e.Use(middleware.CSRF())
 
 	return f
 }

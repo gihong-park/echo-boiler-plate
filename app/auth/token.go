@@ -4,7 +4,6 @@ import (
 	"blog_api/app/auth/role"
 	"blog_api/app/util"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,10 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -24,7 +24,6 @@ var (
 
 func init() {
 	if !util.IsTest() {
-
 		if err := godotenv.Load(util.GetRootPath() + "/.env"); err != nil {
 			log.Fatalf("[FATAL] fail to load .env file: %w", err)
 		}
@@ -50,7 +49,7 @@ func GenerateMapClaim(user_id uint32, authority role.Role) *jwt.MapClaims {
 	return &claims
 }
 
-func TokenValidByRole(r role.Role) func(r *http.Request) error {
+func TokenValidByRole(_role role.Role) func(r *http.Request) error {
 	return func(r *http.Request) error {
 		tokenString := ExtractToken(r)
 		token, err := jwt.Parse(tokenString, keyFunc)
@@ -63,6 +62,13 @@ func TokenValidByRole(r role.Role) func(r *http.Request) error {
 			if err != nil {
 				return fmt.Errorf("claims is not valid because: %w", err)
 			}
+
+			authority, ok := claims["authority"].(map[string]interface{})
+			if ok {
+				if !_role.Valid(authority) {
+					return echo.NewHTTPError(http.StatusUnauthorized, "this token is not for current route")
+				}
+			}
 		}
 		return nil
 	}
@@ -71,7 +77,7 @@ func TokenValidByRole(r role.Role) func(r *http.Request) error {
 func keyFunc(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		log.Errorf("unexpected signing method: %w", token.Header["alg"])
-		return nil, fmt.Errorf("unexpected signing method: %w", token.Header["alg"])
+		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
 	return []byte(API_SECRET), nil
 }
@@ -138,5 +144,5 @@ func pretty(data interface{}) {
 		log.Errorf("[ERROR] json marshal failed: %w", err)
 		return
 	}
-	log.Infof("[INFO] json marshal as : %s", string(b))
+	log.Infof("[INFO] json marshal as : \n%s", string(b))
 }

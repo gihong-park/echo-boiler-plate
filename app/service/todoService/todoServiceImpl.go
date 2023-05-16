@@ -5,6 +5,9 @@ import (
 	"blog_api/app/model"
 	"blog_api/app/repository/todoRepository"
 	tr "blog_api/app/repository/todoRepository"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 type TodoServiceImpl struct {
@@ -17,6 +20,9 @@ func (todoServ *TodoServiceImpl) SetRepo(todoRepo tr.TodoRepository) todoReposit
 }
 
 func (todoServ *TodoServiceImpl) Save(todoDTO *dto.TodoDTO) (*model.Todo, error) {
+	if todoDTO.Body == "" {
+		return &model.Todo{}, echo.NewHTTPError(http.StatusBadRequest, "todo must not be empty")
+	}
 	return todoServ.todoRepo.Save(todoDTO)
 }
 
