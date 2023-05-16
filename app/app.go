@@ -29,10 +29,10 @@ func Init() {
 	defer f.Close()
 
 	app.db.Debug().AutoMigrate(&model.Todo{})
+	app.db.Debug().AutoMigrate(&model.User{})
 
 	p := promMW.NewPrometheus("blog_api", nil)
 	p.Use(app.server)
-	app.server.HTTPErrorHandler = echoServer.DefaultHTTPErrorHandler
 
 	app.server.Logger.Fatal(app.server.Start(":" + os.Getenv("API_PORT")))
 }

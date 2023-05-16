@@ -89,8 +89,7 @@ func TestExtractClaim(t *testing.T) {
 	}
 
 	var user_id float64 = 1
-	authority := make(map[string]interface{})
-	authority["0"] = true
+	authority := map[string]interface{}{"Admin": false, "Member": true}
 
 	assert.Equal(t, user_id, claims["user_id"])
 	assert.Equal(t, authority, claims["authority"])
